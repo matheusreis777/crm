@@ -22,11 +22,12 @@ export const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     fontFamily: "Poppins",
-    textAlign: "right",
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
     color: "white",
     fontFamily: "Poppins",
+    textAlign: "center",
   },
 });

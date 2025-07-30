@@ -53,7 +53,7 @@ export default function Index() {
             placeholder="Senha"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry={true}
+            isPassword
           />
 
           <Button title="Login" onPress={loginScreen} />

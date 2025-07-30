@@ -5,6 +5,10 @@ export const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 16,
   },
+  inputWrapper: {
+    position: "relative",
+    width: "100%",
+  },
   input: {
     width: "100%",
     height: 48,
@@ -15,11 +19,11 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
     fontFamily: "Poppins",
+    paddingRight: 40, // ⚠️ espaço pro ícone não ficar em cima do texto
   },
-  label: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 8,
-    fontFamily: "Poppins",
+  eyeIcon: {
+    position: "absolute",
+    right: 16,
+    top: 14, // centraliza verticalmente (ajuste conforme altura)
   },
 });
