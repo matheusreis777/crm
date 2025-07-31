@@ -1,5 +1,6 @@
 import { api } from "./api";
+import { LoginModel } from "./../models/login";
 
-export async function login(email: string, password: string) {
-  return api.post("/auth/login", { email, password });
+export async function login(data: LoginModel) {
+  return api.post("login", data);
 }

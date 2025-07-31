@@ -12,16 +12,22 @@ import { Input } from "./../components/input";
 import { useState } from "react";
 import { styles } from "./../app/styles";
 import Constants from "expo-constants";
+import { useAuth } from "../context/AuthContext";
 
 export default function Index() {
-  const [cpf, setCpf] = useState("");
-  const [password, setPassword] = useState("");
+  const { signIn } = useAuth();
+  console.log("##### Index.tsx CARREGOU #####");
+  const [cpf, setCpf] = useState("05993791110");
+  const [senha, setPassword] = useState("Mt33867756!@#");
   const statusBarHeight = Constants.statusBarHeight;
 
-  function loginScreen() {
-    console.log("CPF:", cpf);
-    console.log("Senha:", password);
-    Alert.alert("Hello, World!");
+  async function loginScreen() {
+    try {
+      await signIn(cpf, senha);
+      Alert.alert("Login OK");
+    } catch (error) {
+      Alert.alert("Erro ao fazer login");
+    }
   }
 
   return (
@@ -51,7 +57,7 @@ export default function Index() {
 
           <Input
             placeholder="Senha"
-            value={password}
+            value={senha}
             onChangeText={setPassword}
             isPassword
           />
