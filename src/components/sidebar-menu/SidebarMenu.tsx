@@ -39,7 +39,7 @@ const SidebarMenu: React.FC<Props> = ({
       bottom: 0,
       left: 0,
       width: 280,
-      zIndex: 999, // Muito importante
+      zIndex: 999,
       backgroundColor: theme.background,
       paddingHorizontal: 20,
       paddingVertical: 30,
@@ -49,7 +49,9 @@ const SidebarMenu: React.FC<Props> = ({
       flexDirection: "row",
       alignItems: "center",
       marginTop: 40,
-      marginBottom: 20,
+      borderBottomWidth: 1,
+      paddingBottom: 20,
+      borderBottomColor: theme.text,
     },
 
     initialsCircle: {
@@ -93,6 +95,7 @@ const SidebarMenu: React.FC<Props> = ({
 
     icon: {
       marginRight: 16,
+      fontSize: 16,
     },
 
     sidebarItem: {
@@ -102,10 +105,12 @@ const SidebarMenu: React.FC<Props> = ({
     },
 
     menuItemSair: {
-      marginTop: 20,
+      flexDirection: "row",
       borderTopWidth: 1,
-      borderTopColor: theme.text || "#eee",
-      paddingTop: 14,
+      paddingVertical: 14,
+      paddingLeft: 6,
+      borderTopColor: theme.text,
+      borderBottomColor: "transparent",
     },
   });
 
@@ -166,7 +171,7 @@ const SidebarMenu: React.FC<Props> = ({
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.menuItem}>
+      <TouchableOpacity>
         <SwitchTheme />
       </TouchableOpacity>
 
