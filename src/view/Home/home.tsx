@@ -18,10 +18,11 @@ import { useNavigation } from "@react-navigation/native";
 import Navbar from "@/src/components/navbar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { maskCPF } from "@/src/utils/util";
-import SwitchTheme from "../../components/switch-theme/switch-theme";
 import { useTheme } from "../../context/ThemeContext";
+import SidebarMenu from "../../components/sidebar-menu/SidebarMenu";
 
 const { width } = Dimensions.get("window");
+const STATUS_BAR_HEIGHT = StatusBar.currentHeight || 20;
 
 export default function Home() {
   const { signOut } = useAuth();
@@ -34,7 +35,6 @@ export default function Home() {
   const [nameUser, setNameUser] = useState("");
   const [descriptionProfile, setDescriptionProfile] = useState("");
   const [login, setLogin] = useState("");
-  const [empresaSelecionada, setEmpresaSelecionada] = useState<any>({});
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -42,14 +42,6 @@ export default function Home() {
       const name = await AsyncStorage.getItem("@nameUser");
       const description = await AsyncStorage.getItem("@descriptionProfile");
       const loginStored = await AsyncStorage.getItem("@login");
-      const empresaSelecionada = await AsyncStorage.getItem(
-        "@empresaSelecionada"
-      );
-
-      if (empresaSelecionada) {
-        const empresaObj = JSON.parse(empresaSelecionada);
-        setEmpresaSelecionada(empresaObj);
-      }
 
       setNameUser(name || "");
       setDescriptionProfile(description || "");
@@ -61,36 +53,25 @@ export default function Home() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    // Simula recarregamento de dados, pode colocar aqui a chamada real de refresh
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1500);
+    setTimeout(() => setRefreshing(false), 1500);
   }, []);
 
-  async function handleSignOut() {
+  const handleSignOut = async () => {
     await signOut();
     navigation.navigate("Login" as never);
-  }
+  };
 
-  function navigationTo(caminho: string) {
+  const navigationTo = (caminho: string) => {
     navigation.navigate(caminho as never);
-  }
+  };
 
   const toggleSidebar = () => {
-    if (sidebarOpen) {
-      Animated.timing(sidebarAnim, {
-        toValue: -width,
-        duration: 300,
-        useNativeDriver: false,
-      }).start(() => setSidebarOpen(false));
-    } else {
-      setSidebarOpen(true);
-      Animated.timing(sidebarAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    }
+    const toValue = sidebarOpen ? -width : 0;
+    Animated.timing(sidebarAnim, {
+      toValue,
+      duration: 300,
+      useNativeDriver: false,
+    }).start(() => setSidebarOpen(!sidebarOpen));
   };
 
   const getInitials = (name: string) => {
@@ -106,42 +87,6 @@ export default function Home() {
       flex: 1,
       backgroundColor: theme.background,
     },
-    title: {
-      color: "#fff",
-      fontSize: 24,
-      fontWeight: "bold",
-      marginBottom: 20,
-    },
-    subtitle: {
-      fontSize: 18,
-      color: theme.text,
-      alignItems: "center",
-    },
-
-    button: {
-      backgroundColor: "#007AFF",
-      paddingVertical: 12,
-      paddingHorizontal: 24,
-      borderRadius: 8,
-    },
-    buttonText: {
-      color: "#fff",
-      fontSize: 18,
-    },
-    sidebar: {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      width: width * 0.7,
-      backgroundColor: theme.background,
-      paddingTop: StatusBar.currentHeight || 20,
-      elevation: 5,
-      zIndex: 1000, // maior para garantir que fique sobre tudo
-      shadowColor: "#000",
-      shadowOpacity: 0.3,
-      shadowOffset: { width: 0, height: 3 },
-      shadowRadius: 5,
-    },
     overlay: {
       position: "absolute",
       top: 0,
@@ -151,107 +96,17 @@ export default function Home() {
       backgroundColor: "rgba(0,0,0,0.3)",
       zIndex: 999,
     },
-    viewProfileRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingTop: 40,
-      paddingBottom: 20,
-      paddingLeft: 18,
-      borderBottomWidth: 1,
-      borderBottomColor: "#ccc",
-    },
-
-    initialsCircle: {
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      backgroundColor: "#007AFF",
-      justifyContent: "center",
-      alignItems: "center",
-      marginRight: 16,
-    },
-
-    initialsText: {
-      color: theme.text,
-      fontSize: 24,
-      fontWeight: "bold",
-    },
-
-    viewProfileText: {
-      flex: 1,
-    },
-
-    textStrong: {
-      fontWeight: "700",
-    },
-
-    profileText: {
-      fontSize: 16,
-      color: theme.text,
-    },
-
-    sidebarItem: {
-      fontSize: 16,
-      color: theme.text,
-      fontWeight: "500",
-    },
-
-    menuItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: 14,
-      paddingHorizontal: 20,
-      backgroundColor: theme.background,
-      borderBottomWidth: 1,
-      borderBottomColor: "#f0f0f0",
-    },
-
-    menuItemSair: {
-      paddingBottom: 40,
-    },
-
-    icon: {
-      marginRight: 16,
-      color: theme.text,
-    },
-
-    themeToggleButton: {
-      position: "absolute",
-      top: (StatusBar.currentHeight || 20) + 10,
-      right: 20,
-      width: 50,
-      height: 50,
-      borderRadius: 25,
-      backgroundColor: theme.background,
-      justifyContent: "center",
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.3,
-      shadowRadius: 4,
-      elevation: 5,
-      zIndex: 100,
-    },
-    dashboardContainer: {
-      width: "100%",
-      paddingHorizontal: 16,
-      paddingTop: 120,
-      flex: 1,
-    },
-
     sectionTitle: {
       fontSize: 22,
       fontWeight: "bold",
       marginBottom: 16,
       color: theme.text,
     },
-
     cardsContainer: {
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-between",
     },
-
     card: {
       width: "48%",
       backgroundColor: theme.background,
@@ -264,19 +119,16 @@ export default function Home() {
       shadowRadius: 4,
       elevation: 3,
     },
-
     cardTitle: {
       fontSize: 14,
       color: theme.text,
     },
-
     cardValue: {
       fontSize: 24,
       fontWeight: "bold",
       color: theme.text,
       marginTop: 8,
     },
-
     fab: {
       position: "absolute",
       bottom: 30,
@@ -295,6 +147,7 @@ export default function Home() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <Navbar toggleSidebar={toggleSidebar} title="Painel" />
+
         {sidebarOpen && (
           <TouchableOpacity
             style={styles.overlay}
@@ -302,75 +155,23 @@ export default function Home() {
             onPress={toggleSidebar}
           />
         )}
-        <Animated.View style={[styles.sidebar, { left: sidebarAnim }]}>
-          <View style={styles.viewProfileRow}>
-            <View style={styles.initialsCircle}>
-              <Text style={styles.initialsText}>{getInitials(nameUser)}</Text>
-            </View>
 
-            <View style={styles.viewProfileText}>
-              <Text style={[styles.profileText, styles.textStrong]}>
-                {nameUser}
-              </Text>
-              <Text style={styles.profileText}>{descriptionProfile}</Text>
-              <Text style={styles.profileText}>{login}</Text>
-            </View>
-          </View>
-
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => navigationTo("Home")}
-            >
-              <Feather name="home" size={24} color="#555" style={styles.icon} />
-              <Text style={styles.sidebarItem}>Painel</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => navigationTo("Profile")}
-            >
-              <Feather name="user" size={24} color="#555" style={styles.icon} />
-              <Text style={styles.sidebarItem}>Perfil</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => navigationTo("Config")}
-            >
-              <Feather
-                name="settings"
-                size={24}
-                color="#555"
-                style={styles.icon}
-              />
-              <Text style={styles.sidebarItem}>Configurações</Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity style={styles.menuItem}>
-            <SwitchTheme />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.menuItem, styles.menuItemSair]}
-            onPress={handleSignOut}
-          >
-            <Feather
-              name="log-out"
-              size={24}
-              color="#555"
-              style={styles.icon}
-            />
-            <Text style={[styles.sidebarItem]}>Sair</Text>
-          </TouchableOpacity>
-        </Animated.View>
+        <SidebarMenu
+          sidebarAnim={sidebarAnim}
+          nameUser={nameUser}
+          descriptionProfile={descriptionProfile}
+          login={login}
+          navigationTo={navigationTo}
+          handleSignOut={handleSignOut}
+          getInitials={getInitials}
+        />
 
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{
             paddingHorizontal: 16,
             paddingTop: 120,
-            flexGrow: 1,
+            paddingBottom: 30,
           }}
           keyboardShouldPersistTaps="handled"
           refreshControl={
@@ -379,92 +180,71 @@ export default function Home() {
         >
           <Text style={styles.sectionTitle}>Dashboard</Text>
 
-          {/* Cards principais */}
           <View style={styles.cardsContainer}>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Vendas no mês</Text>
-              <Text style={styles.cardValue}>12</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Veículos em estoque</Text>
-              <Text style={styles.cardValue}>35</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Clientes</Text>
-              <Text style={styles.cardValue}>87</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Lucro Estimado</Text>
-              <Text style={styles.cardValue}>R$ 120.500</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Meta do Mês</Text>
-              <Text style={styles.cardValue}>R$ 150.000</Text>
-            </View>
-          </View>
-
-          {/* Últimas Vendas */}
-          <Text style={styles.sectionTitle}>Últimas Vendas</Text>
-          <View style={{ marginBottom: 16 }}>
             {[
-              { cliente: "João Silva", modelo: "Corolla", data: "01/08" },
-              { cliente: "Maria Souza", modelo: "HB20", data: "02/08" },
-              { cliente: "Carlos Lima", modelo: "Civic", data: "04/08" },
+              { title: "Vendas no mês", value: "12" },
+              { title: "Veículos em estoque", value: "35" },
+              { title: "Clientes", value: "87" },
+              { title: "Lucro Estimado", value: "R$ 120.500" },
+              { title: "Meta do Mês", value: "R$ 150.000" },
             ].map((item, index) => (
-              <View
-                key={index}
-                style={{
-                  backgroundColor: theme.background,
-                  padding: 12,
-                  borderRadius: 8,
-                  marginBottom: 8,
-                }}
-              >
-                <Text
-                  style={{
-                    color: theme.text,
-                    fontWeight: "bold",
-                  }}
-                >
-                  {item.cliente}
-                </Text>
-                <Text style={{ color: theme.text }}>
-                  {item.modelo} - {item.data}
-                </Text>
+              <View key={index} style={styles.card}>
+                <Text style={styles.cardTitle}>{item.title}</Text>
+                <Text style={styles.cardValue}>{item.value}</Text>
               </View>
             ))}
           </View>
 
-          {/* Notificações */}
+          <Text style={styles.sectionTitle}>Últimas Vendas</Text>
+          {[
+            { cliente: "João Silva", modelo: "Corolla", data: "01/08" },
+            { cliente: "Maria Souza", modelo: "HB20", data: "02/08" },
+            { cliente: "Carlos Lima", modelo: "Civic", data: "04/08" },
+          ].map((item, index) => (
+            <View
+              key={index}
+              style={{
+                backgroundColor: theme.background,
+                padding: 12,
+                borderRadius: 8,
+                marginBottom: 8,
+              }}
+            >
+              <Text style={{ color: theme.text, fontWeight: "bold" }}>
+                {item.cliente}
+              </Text>
+              <Text style={{ color: theme.text }}>
+                {item.modelo} - {item.data}
+              </Text>
+            </View>
+          ))}
+
           <Text style={styles.sectionTitle}>Notificações Recentes</Text>
-          <View>
-            {[
-              "Novo cliente cadastrado",
-              "Venda confirmada: Onix 2023",
-              "Atualização no sistema",
-            ].map((msg, idx) => (
-              <View
-                key={idx}
-                style={{
-                  backgroundColor: theme.background,
-                  padding: 10,
-                  borderRadius: 6,
-                  marginBottom: 6,
-                }}
-              >
-                <Text style={{ color: theme.text }}>{msg}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Botão flutuante */}
-          <TouchableOpacity
-            style={styles.fab}
-            onPress={() => navigationTo("NovoVeiculo")}
-          >
-            <Feather name="plus" size={24} color="#fff" />
-          </TouchableOpacity>
+          {[
+            "Novo cliente cadastrado",
+            "Venda confirmada: Onix 2023",
+            "Atualização no sistema",
+          ].map((msg, idx) => (
+            <View
+              key={idx}
+              style={{
+                backgroundColor: theme.background,
+                padding: 10,
+                borderRadius: 6,
+                marginBottom: 6,
+              }}
+            >
+              <Text style={{ color: theme.text }}>{msg}</Text>
+            </View>
+          ))}
         </ScrollView>
+
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => navigationTo("NovoVeiculo")}
+        >
+          <Feather name="plus" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
   );

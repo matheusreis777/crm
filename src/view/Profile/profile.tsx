@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import Navbar from "@/src/components/navbar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { maskCPF } from "@/src/utils/util";
+import SidebarMenu from "../../components/sidebar-menu/SidebarMenu";
 
 const { width } = Dimensions.get("window");
 
@@ -219,76 +220,16 @@ export default function Profile() {
             onPress={toggleSidebar}
           />
         )}
-        <Animated.View style={[styles.sidebar, { left: sidebarAnim }]}>
-          <View style={styles.viewProfileRow}>
-            <View style={styles.initialsCircle}>
-              <Text style={styles.initialsText}>{getInitials(nameUser)}</Text>
-            </View>
 
-            <View style={styles.viewProfileText}>
-              <Text style={[styles.profileText, styles.textStrong]}>
-                {nameUser}
-              </Text>
-              <Text style={styles.profileText}>{descriptionProfile}</Text>
-              <Text style={styles.profileText}>{login}</Text>
-            </View>
-          </View>
-
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => navigationTo("Home")}
-            >
-              <Feather name="home" size={24} color="#555" style={styles.icon} />
-              <Text style={styles.sidebarItem}>Painel</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => navigationTo("Profile")}
-            >
-              <Feather name="user" size={24} color="#555" style={styles.icon} />
-              <Text style={styles.sidebarItem}>Perfil</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => navigationTo("Config")}
-            >
-              <Feather
-                name="settings"
-                size={24}
-                color="#555"
-                style={styles.icon}
-              />
-              <Text style={styles.sidebarItem}>Configurações</Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity style={styles.menuItem} onPress={toggleTheme}>
-            <Feather
-              name={isDarkTheme ? "sun" : "moon"}
-              size={24}
-              color="#555"
-              style={styles.icon}
-            />
-            <Text style={styles.sidebarItem}>
-              {isDarkTheme ? "Tema Claro" : "Tema Escuro"}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.menuItem, styles.menuItemSair]}
-            onPress={handleSignOut}
-          >
-            <Feather
-              name="log-out"
-              size={24}
-              color="#555"
-              style={styles.icon}
-            />
-            <Text style={[styles.sidebarItem]}>Sair</Text>
-          </TouchableOpacity>
-        </Animated.View>
+        <SidebarMenu
+          sidebarAnim={sidebarAnim}
+          nameUser={nameUser}
+          descriptionProfile={descriptionProfile}
+          login={login}
+          navigationTo={navigationTo}
+          handleSignOut={handleSignOut}
+          getInitials={getInitials}
+        />
       </View>
     </TouchableWithoutFeedback>
   );
