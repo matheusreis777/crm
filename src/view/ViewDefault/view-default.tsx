@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Feather from "react-native-vector-icons/Feather";
 import {
   View,
@@ -10,23 +10,18 @@ import {
   Dimensions,
   Animated,
   StatusBar,
-  ScrollView,
-  RefreshControl,
 } from "react-native";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import Navbar from "@/src/components/navbar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { maskCPF } from "@/src/utils/util";
-import SwitchTheme from "../../components/switch-theme/switch-theme";
-import { useTheme } from "../../context/ThemeContext";
 
 const { width } = Dimensions.get("window");
 
-export default function Home() {
+export default function ViewDefault() {
   const { signOut } = useAuth();
   const navigation = useNavigation();
-  const { theme } = useTheme();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const sidebarAnim = useState(new Animated.Value(-width))[0];
@@ -34,22 +29,13 @@ export default function Home() {
   const [nameUser, setNameUser] = useState("");
   const [descriptionProfile, setDescriptionProfile] = useState("");
   const [login, setLogin] = useState("");
-  const [empresaSelecionada, setEmpresaSelecionada] = useState<any>({});
-  const [refreshing, setRefreshing] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(true);
 
   useEffect(() => {
     async function loadUserData() {
       const name = await AsyncStorage.getItem("@nameUser");
       const description = await AsyncStorage.getItem("@descriptionProfile");
       const loginStored = await AsyncStorage.getItem("@login");
-      const empresaSelecionada = await AsyncStorage.getItem(
-        "@empresaSelecionada"
-      );
-
-      if (empresaSelecionada) {
-        const empresaObj = JSON.parse(empresaSelecionada);
-        setEmpresaSelecionada(empresaObj);
-      }
 
       setNameUser(name || "");
       setDescriptionProfile(description || "");
@@ -59,13 +45,9 @@ export default function Home() {
     loadUserData();
   }, []);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    // Simula recarregamento de dados, pode colocar aqui a chamada real de refresh
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1500);
-  }, []);
+  const toggleTheme = () => {
+    setIsDarkTheme((prev) => !prev);
+  };
 
   async function handleSignOut() {
     await signOut();
@@ -104,7 +86,9 @@ export default function Home() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.background,
+      backgroundColor: isDarkTheme ? "#121212" : "#f5f5f5",
+      justifyContent: "center",
+      alignItems: "center",
     },
     title: {
       color: "#fff",
@@ -112,14 +96,8 @@ export default function Home() {
       fontWeight: "bold",
       marginBottom: 20,
     },
-    subtitle: {
-      fontSize: 18,
-      color: theme.text,
-      alignItems: "center",
-    },
-
     button: {
-      backgroundColor: "#007AFF",
+      backgroundColor: isDarkTheme ? "#173fd2ff" : "#007AFF",
       paddingVertical: 12,
       paddingHorizontal: 24,
       borderRadius: 8,
@@ -133,14 +111,10 @@ export default function Home() {
       top: 0,
       bottom: 0,
       width: width * 0.7,
-      backgroundColor: theme.background,
+      backgroundColor: isDarkTheme ? "#121212" : "#f5f5f5",
       paddingTop: StatusBar.currentHeight || 20,
       elevation: 5,
-      zIndex: 1000, // maior para garantir que fique sobre tudo
-      shadowColor: "#000",
-      shadowOpacity: 0.3,
-      shadowOffset: { width: 0, height: 3 },
-      shadowRadius: 5,
+      zIndex: 20,
     },
     overlay: {
       position: "absolute",
@@ -149,7 +123,7 @@ export default function Home() {
       right: 0,
       bottom: 0,
       backgroundColor: "rgba(0,0,0,0.3)",
-      zIndex: 999,
+      zIndex: 15,
     },
     viewProfileRow: {
       flexDirection: "row",
@@ -172,7 +146,7 @@ export default function Home() {
     },
 
     initialsText: {
-      color: theme.text,
+      color: isDarkTheme ? "#ffffff" : "#000",
       fontSize: 24,
       fontWeight: "bold",
     },
@@ -182,17 +156,17 @@ export default function Home() {
     },
 
     textStrong: {
-      fontWeight: "700",
+      fontWeight: 700,
     },
 
     profileText: {
       fontSize: 16,
-      color: theme.text,
+      color: isDarkTheme ? "#ffffff" : "#000",
     },
 
     sidebarItem: {
       fontSize: 16,
-      color: theme.text,
+      color: isDarkTheme ? "#ffffff" : "#000",
       fontWeight: "500",
     },
 
@@ -201,7 +175,7 @@ export default function Home() {
       alignItems: "center",
       paddingVertical: 14,
       paddingHorizontal: 20,
-      backgroundColor: theme.background,
+      backgroundColor: isDarkTheme ? "#121212" : "#f5f5f5",
       borderBottomWidth: 1,
       borderBottomColor: "#f0f0f0",
     },
@@ -212,7 +186,7 @@ export default function Home() {
 
     icon: {
       marginRight: 16,
-      color: theme.text,
+      color: isDarkTheme ? "#ffffff" : "#000",
     },
 
     themeToggleButton: {
@@ -222,7 +196,7 @@ export default function Home() {
       width: 50,
       height: 50,
       borderRadius: 25,
-      backgroundColor: theme.background,
+      backgroundColor: isDarkTheme ? "#333" : "#ddd",
       justifyContent: "center",
       alignItems: "center",
       shadowColor: "#000",
@@ -232,69 +206,12 @@ export default function Home() {
       elevation: 5,
       zIndex: 100,
     },
-    dashboardContainer: {
-      width: "100%",
-      paddingHorizontal: 16,
-      paddingTop: 120,
-      flex: 1,
-    },
-
-    sectionTitle: {
-      fontSize: 22,
-      fontWeight: "bold",
-      marginBottom: 16,
-      color: theme.text,
-    },
-
-    cardsContainer: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-    },
-
-    card: {
-      width: "48%",
-      backgroundColor: theme.background,
-      borderRadius: 10,
-      padding: 16,
-      marginBottom: 16,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-    },
-
-    cardTitle: {
-      fontSize: 14,
-      color: theme.text,
-    },
-
-    cardValue: {
-      fontSize: 24,
-      fontWeight: "bold",
-      color: theme.text,
-      marginTop: 8,
-    },
-
-    fab: {
-      position: "absolute",
-      bottom: 30,
-      right: 30,
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      backgroundColor: "#007AFF",
-      justifyContent: "center",
-      alignItems: "center",
-      elevation: 6,
-    },
   });
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <Navbar toggleSidebar={toggleSidebar} title="Painel" />
+        <Navbar toggleSidebar={toggleSidebar} title="Default" />
         {sidebarOpen && (
           <TouchableOpacity
             style={styles.overlay}
@@ -347,8 +264,16 @@ export default function Home() {
               <Text style={styles.sidebarItem}>Configurações</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.menuItem}>
-            <SwitchTheme />
+          <TouchableOpacity style={styles.menuItem} onPress={toggleTheme}>
+            <Feather
+              name={isDarkTheme ? "sun" : "moon"}
+              size={24}
+              color="#555"
+              style={styles.icon}
+            />
+            <Text style={styles.sidebarItem}>
+              {isDarkTheme ? "Tema Claro" : "Tema Escuro"}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -364,107 +289,6 @@ export default function Home() {
             <Text style={[styles.sidebarItem]}>Sair</Text>
           </TouchableOpacity>
         </Animated.View>
-
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            paddingHorizontal: 16,
-            paddingTop: 120,
-            flexGrow: 1,
-          }}
-          keyboardShouldPersistTaps="handled"
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
-          <Text style={styles.sectionTitle}>Dashboard</Text>
-
-          {/* Cards principais */}
-          <View style={styles.cardsContainer}>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Vendas no mês</Text>
-              <Text style={styles.cardValue}>12</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Veículos em estoque</Text>
-              <Text style={styles.cardValue}>35</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Clientes</Text>
-              <Text style={styles.cardValue}>87</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Lucro Estimado</Text>
-              <Text style={styles.cardValue}>R$ 120.500</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Meta do Mês</Text>
-              <Text style={styles.cardValue}>R$ 150.000</Text>
-            </View>
-          </View>
-
-          {/* Últimas Vendas */}
-          <Text style={styles.sectionTitle}>Últimas Vendas</Text>
-          <View style={{ marginBottom: 16 }}>
-            {[
-              { cliente: "João Silva", modelo: "Corolla", data: "01/08" },
-              { cliente: "Maria Souza", modelo: "HB20", data: "02/08" },
-              { cliente: "Carlos Lima", modelo: "Civic", data: "04/08" },
-            ].map((item, index) => (
-              <View
-                key={index}
-                style={{
-                  backgroundColor: theme.background,
-                  padding: 12,
-                  borderRadius: 8,
-                  marginBottom: 8,
-                }}
-              >
-                <Text
-                  style={{
-                    color: theme.text,
-                    fontWeight: "bold",
-                  }}
-                >
-                  {item.cliente}
-                </Text>
-                <Text style={{ color: theme.text }}>
-                  {item.modelo} - {item.data}
-                </Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Notificações */}
-          <Text style={styles.sectionTitle}>Notificações Recentes</Text>
-          <View>
-            {[
-              "Novo cliente cadastrado",
-              "Venda confirmada: Onix 2023",
-              "Atualização no sistema",
-            ].map((msg, idx) => (
-              <View
-                key={idx}
-                style={{
-                  backgroundColor: theme.background,
-                  padding: 10,
-                  borderRadius: 6,
-                  marginBottom: 6,
-                }}
-              >
-                <Text style={{ color: theme.text }}>{msg}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Botão flutuante */}
-          <TouchableOpacity
-            style={styles.fab}
-            onPress={() => navigationTo("NovoVeiculo")}
-          >
-            <Feather name="plus" size={24} color="#fff" />
-          </TouchableOpacity>
-        </ScrollView>
       </View>
     </TouchableWithoutFeedback>
   );

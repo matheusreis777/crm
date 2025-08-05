@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,26 +9,40 @@ import {
   StatusBar,
   ActivityIndicator,
   StyleSheet,
-  Button as RNButton, // botão nativo simples só pra demo
 } from "react-native";
-import { Button } from "./../components/button";
-import { Input } from "./../components/input";
 import Constants from "expo-constants";
 import { useAuth } from "../context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Button } from "./../components/button";
+import { Input } from "./../components/input";
+import SwitchTheme from "../components/switch-theme/switch-theme";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Index() {
-  // Estado para controlar tema manualmente
-  const [isDark, setIsDark] = useState(false);
-
+  const { theme } = useTheme();
   const { signIn } = useAuth();
   const [cpf, setCpf] = useState("05993791110");
   const [senha, setPassword] = useState("Mt33867756!@#");
   const statusBarHeight = Constants.statusBarHeight;
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const [empresas, setEmpresas] = useState<any[]>([]);
 
-  async function loginScreen() {
+  useEffect(() => {
+    loadEmpresas();
+  }, []);
+
+  const loadEmpresas = async () => {
+    try {
+      const empresasStorage = await AsyncStorage.getItem("@empresas");
+      setEmpresas(empresasStorage ? JSON.parse(empresasStorage) : []);
+    } catch (error) {
+      console.error("Erro ao carregar empresas:", error);
+    }
+  };
+
+  const loginScreen = async () => {
     if (!cpf || !senha) {
       Alert.alert("Atenção", "Preencha CPF e senha.");
       return;
@@ -36,37 +50,47 @@ export default function Index() {
 
     setLoading(true);
     try {
-      await signIn(cpf, senha);
-      Alert.alert("Sucesso", "Login realizado com sucesso!");
-      navigation.navigate("Home" as never);
-    } catch (error: any) {
-      Alert.alert("Falha no login");
+      const response = await signIn(cpf, senha);
+
+      const empresasStorage = await AsyncStorage.getItem("@empresas");
+      const empresasParsed = empresasStorage ? JSON.parse(empresasStorage) : [];
+
+      if (empresasParsed.length === 1) {
+        await AsyncStorage.setItem(
+          "@empresaSelecionada",
+          JSON.stringify(empresasParsed[0])
+        );
+        navigation.navigate("Home" as never);
+      } else {
+        navigation.navigate("Intro" as never);
+      }
+    } catch (error) {
+      Alert.alert("Falha no login", "Verifique suas credenciais.");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  // Estilos que dependem do tema manual
+  // 🔧 Estilos adaptados ao tema
   const styles = StyleSheet.create({
     background: {
       flex: 1,
-      backgroundColor: isDark ? "#000" : "#fff",
       resizeMode: "cover",
       position: "absolute",
       top: 0,
       bottom: 0,
       left: 0,
       right: 0,
+      backgroundColor: theme.background,
     },
     view: {
       flex: 1,
       padding: 28,
       gap: 16,
-      paddingTop: 0,
       justifyContent: "center",
     },
     title: {
-      color: isDark ? "#fff" : "#000",
+      color: theme.text,
       fontSize: 32,
       fontWeight: "bold",
       fontFamily: "Poppins",
@@ -74,7 +98,7 @@ export default function Index() {
     },
     subtitle: {
       fontSize: 16,
-      color: isDark ? "#ccc" : "#555",
+      color: theme.text || "#888",
       fontFamily: "Poppins",
       textAlign: "center",
     },
@@ -93,7 +117,7 @@ export default function Index() {
         <StatusBar
           translucent
           backgroundColor="transparent"
-          barStyle={isDark ? "light-content" : "dark-content"}
+          barStyle={theme.mode === "dark" ? "light-content" : "dark-content"}
         />
 
         <View style={styles.view}>
@@ -104,33 +128,26 @@ export default function Index() {
 
           <Input
             placeholder="CPF"
-            type={"cpf"}
+            type="cpf"
             value={cpf}
-            isDark={isDark}
-            onChangeText={setCpf}
+            onChangeText={(text) => setCpf(text)}
           />
 
           <Input
             placeholder="Senha"
             value={senha}
-            isDark={isDark}
-            onChangeText={setPassword}
+            onChangeText={(text) => setPassword(text)}
             isPassword
           />
 
           {loading ? (
-            <ActivityIndicator size="large" color="#ffffff" />
+            <ActivityIndicator size="large" color={theme.primary} />
           ) : (
             <Button title="Login" onPress={loginScreen} />
           )}
 
-          {/* Botão para alternar tema */}
           <View style={styles.toggleButton}>
-            <RNButton
-              title={isDark ? "Modo Claro" : "Modo Escuro"}
-              onPress={() => setIsDark(!isDark)}
-              color={isDark ? "#bbb" : "#333"}
-            />
+            <SwitchTheme />
           </View>
         </View>
       </ImageBackground>
