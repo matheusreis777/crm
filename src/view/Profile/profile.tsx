@@ -10,6 +10,9 @@ import {
   Dimensions,
   Animated,
   StatusBar,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
@@ -17,6 +20,9 @@ import Navbar from "@/src/components/navbar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { maskCPF } from "@/src/utils/util";
 import SidebarMenu from "../../components/sidebar-menu/SidebarMenu";
+import { Input } from "@/src/components/input/input";
+import { Button } from "@/src/components/button";
+import { useTheme } from "@/src/context/ThemeContext";
 
 const { width } = Dimensions.get("window");
 
@@ -30,34 +36,24 @@ export default function Profile() {
   const [nameUser, setNameUser] = useState("");
   const [descriptionProfile, setDescriptionProfile] = useState("");
   const [login, setLogin] = useState("");
-  const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const [phone, setPhone] = useState("");
+  const { theme } = useTheme();
 
   useEffect(() => {
     async function loadUserData() {
       const name = await AsyncStorage.getItem("@nameUser");
       const description = await AsyncStorage.getItem("@descriptionProfile");
       const loginStored = await AsyncStorage.getItem("@login");
+      const phone = await AsyncStorage.getItem("@phone");
 
       setNameUser(name || "");
       setDescriptionProfile(description || "");
       setLogin(maskCPF(loginStored || ""));
+      setPhone(phone || "");
     }
 
     loadUserData();
   }, []);
-
-  const toggleTheme = () => {
-    setIsDarkTheme((prev) => !prev);
-  };
-
-  async function handleSignOut() {
-    await signOut();
-    navigation.navigate("Login" as never);
-  }
-
-  function navigationTo(caminho: string) {
-    navigation.navigate(caminho as never);
-  }
 
   const toggleSidebar = () => {
     if (sidebarOpen) {
@@ -76,6 +72,15 @@ export default function Profile() {
     }
   };
 
+  async function handleSignOut() {
+    await signOut();
+    navigation.navigate("Login" as never);
+  }
+
+  function navigationTo(caminho: string) {
+    navigation.navigate(caminho as never);
+  }
+
   const getInitials = (name: string) => {
     if (!name) return "";
     const words = name.trim().split(" ");
@@ -87,35 +92,7 @@ export default function Profile() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDarkTheme ? "#121212" : "#f5f5f5",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    title: {
-      color: "#fff",
-      fontSize: 24,
-      fontWeight: "bold",
-      marginBottom: 20,
-    },
-    button: {
-      backgroundColor: isDarkTheme ? "#173fd2ff" : "#007AFF",
-      paddingVertical: 12,
-      paddingHorizontal: 24,
-      borderRadius: 8,
-    },
-    buttonText: {
-      color: "#fff",
-      fontSize: 18,
-    },
-    sidebar: {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      width: width * 0.7,
-      backgroundColor: isDarkTheme ? "#121212" : "#f5f5f5",
-      paddingTop: StatusBar.currentHeight || 20,
-      elevation: 5,
-      zIndex: 20,
+      backgroundColor: theme.background,
     },
     overlay: {
       position: "absolute",
@@ -126,111 +103,97 @@ export default function Profile() {
       backgroundColor: "rgba(0,0,0,0.3)",
       zIndex: 15,
     },
-    viewProfileRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingTop: 40,
-      paddingBottom: 20,
-      paddingLeft: 18,
-      borderBottomWidth: 1,
-      borderBottomColor: "#ccc",
+    content: {
+      flex: 1,
+      padding: 24,
+      gap: 20,
+      justifyContent: "center",
     },
-
+    header: {
+      alignItems: "center",
+      marginBottom: 20,
+    },
     initialsCircle: {
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      backgroundColor: "#007AFF",
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: theme.initialsCircle,
       justifyContent: "center",
       alignItems: "center",
-      marginRight: 16,
+      marginBottom: 10,
     },
-
     initialsText: {
-      color: isDarkTheme ? "#ffffff" : "#000",
-      fontSize: 24,
+      color: "#fff",
+      fontSize: 28,
       fontWeight: "bold",
     },
-
-    viewProfileText: {
-      flex: 1,
+    nameText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: theme.text,
     },
-
-    textStrong: {
-      fontWeight: 700,
+    descriptionText: {
+      fontSize: 14,
+      color: theme.text,
     },
-
-    profileText: {
-      fontSize: 16,
-      color: isDarkTheme ? "#ffffff" : "#000",
-    },
-
-    sidebarItem: {
-      fontSize: 16,
-      color: isDarkTheme ? "#ffffff" : "#000",
-      fontWeight: "500",
-    },
-
-    menuItem: {
-      flexDirection: "row",
+    logoutButton: {
+      marginTop: 20,
+      backgroundColor: theme.buttonBackground,
+      paddingVertical: 12,
+      borderRadius: 8,
       alignItems: "center",
-      paddingVertical: 14,
-      paddingHorizontal: 20,
-      backgroundColor: isDarkTheme ? "#121212" : "#f5f5f5",
-      borderBottomWidth: 1,
-      borderBottomColor: "#f0f0f0",
     },
-
-    menuItemSair: {
-      paddingBottom: 40,
-    },
-
-    icon: {
-      marginRight: 16,
-      color: isDarkTheme ? "#ffffff" : "#000",
-    },
-
-    themeToggleButton: {
-      position: "absolute",
-      top: (StatusBar.currentHeight || 20) + 10,
-      right: 20,
-      width: 50,
-      height: 50,
-      borderRadius: 25,
-      backgroundColor: isDarkTheme ? "#333" : "#ddd",
-      justifyContent: "center",
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.3,
-      shadowRadius: 4,
-      elevation: 5,
-      zIndex: 100,
+    logoutText: {
+      color: theme.text,
+      fontWeight: "bold",
     },
   });
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <Navbar toggleSidebar={toggleSidebar} title="Profile" />
-        {sidebarOpen && (
-          <TouchableOpacity
-            style={styles.overlay}
-            activeOpacity={1}
-            onPress={toggleSidebar}
-          />
-        )}
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={80} // ajuste se sua navbar for fixa
+      >
+        <View style={styles.container}>
+          <Navbar toggleSidebar={toggleSidebar} title="Perfil" />
 
-        <SidebarMenu
-          sidebarAnim={sidebarAnim}
-          nameUser={nameUser}
-          descriptionProfile={descriptionProfile}
-          login={login}
-          navigationTo={navigationTo}
-          handleSignOut={handleSignOut}
-          getInitials={getInitials}
-        />
-      </View>
+          {sidebarOpen && (
+            <TouchableOpacity
+              style={styles.overlay}
+              activeOpacity={1}
+              onPress={toggleSidebar}
+            />
+          )}
+
+          <SidebarMenu
+            sidebarAnim={sidebarAnim}
+            nameUser={nameUser}
+            descriptionProfile={descriptionProfile}
+            login={login}
+            navigationTo={navigationTo}
+            handleSignOut={handleSignOut}
+            getInitials={getInitials}
+          />
+
+          <ScrollView contentContainerStyle={styles.content}>
+            <View style={styles.header}>
+              <View style={styles.initialsCircle}>
+                <Text style={styles.initialsText}>{getInitials(nameUser)}</Text>
+              </View>
+              <Text style={styles.nameText}>{nameUser}</Text>
+              <Text style={styles.descriptionText}>{descriptionProfile}</Text>
+            </View>
+
+            <Input value={nameUser} placeholder="Nome" editable={false} />
+            <Input value={login} placeholder="CPF" editable={false} />
+            <Input value={phone} type="phone" placeholder="Telefone" />
+
+            <Button title="Sair" onPress={handleSignOut} />
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 }

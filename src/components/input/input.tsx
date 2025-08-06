@@ -11,7 +11,7 @@ import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/src/context/ThemeContext";
 
 interface InputProps extends TextInputProps {
-  type?: "cpf" | "default";
+  type?: "cpf" | "phone" | "date" | "default";
   isPassword?: boolean;
 }
 
@@ -37,12 +37,11 @@ export function Input({
     },
     input: {
       height: 52,
-      backgroundColor:
-        theme.background || (theme.mode === "dark" ? "#1e1e1e" : "#f2f2f2"),
-      color: theme.text || (theme.mode === "dark" ? "#ffffff" : "#000000"),
+      backgroundColor: "transparent",
+      color: theme.text,
       borderRadius: 12,
       borderWidth: 1,
-      borderColor: theme.text || (theme.mode === "dark" ? "#444" : "#ccc"),
+      borderColor: theme.borderColor,
       paddingHorizontal: 16,
       fontSize: 16,
     },
@@ -55,32 +54,51 @@ export function Input({
     },
   });
 
-  // CPF Mask
-  if (type === "cpf") {
+  const placeholderTextColor =
+    theme.text || (theme.mode === "dark" ? "#aaaaaa" : "#888888");
+
+  // Tipos com máscara
+  if (type === "cpf" || type === "phone" || type === "date") {
+    let maskType: any = type;
+    let options: any = {};
+
+    if (type === "phone") {
+      maskType = "cel-phone";
+      options = {
+        maskType: "BRL",
+        withDDD: true,
+        dddMask: "(99) ",
+      };
+    }
+
+    if (type === "date") {
+      maskType = "datetime";
+      options = {
+        format: "DD/MM/YYYY",
+      };
+    }
+
     return (
       <View style={styles.container}>
         <TextInputMask
-          type="cpf"
+          type={maskType}
+          options={options}
           style={styles.input}
-          placeholderTextColor={
-            theme.text || (theme.mode === "dark" ? "#aaaaaa" : "#888888")
-          }
+          placeholderTextColor={placeholderTextColor}
           {...rest}
         />
       </View>
     );
   }
 
-  // Default Input
+  // Tipo padrão ou senha
   return (
     <View style={styles.container}>
       <View style={styles.inputWrapper}>
         <TextInput
           style={styles.input}
           secureTextEntry={isPassword && !showPassword}
-          placeholderTextColor={
-            theme.text || (theme.mode === "dark" ? "#aaaaaa" : "#888888")
-          }
+          placeholderTextColor={placeholderTextColor}
           {...rest}
         />
         {isPassword && (
@@ -88,9 +106,7 @@ export function Input({
             <Feather
               name={showPassword ? "eye-off" : "eye"}
               size={20}
-              color={
-                theme.text || (theme.mode === "dark" ? "#eeeeee" : "#666666")
-              }
+              color={placeholderTextColor}
             />
           </TouchableOpacity>
         )}

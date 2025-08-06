@@ -9,28 +9,30 @@ import {
   StatusBar,
   ActivityIndicator,
   StyleSheet,
+  Switch,
 } from "react-native";
 import Constants from "expo-constants";
 import { useAuth } from "../context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Button } from "./../components/button";
-import { Input } from "./../components/input";
+import { Input } from "./../components/input/input";
 import SwitchTheme from "../components/switch-theme/switch-theme";
 import { useTheme } from "../context/ThemeContext";
 
 export default function Index() {
   const { theme } = useTheme();
   const { signIn } = useAuth();
-  const [cpf, setCpf] = useState("05993791110");
-  const [senha, setPassword] = useState("Mt33867756!@#");
-  const statusBarHeight = Constants.statusBarHeight;
+  const [cpf, setCpf] = useState("");
+  const [senha, setPassword] = useState("");
+  const [stayConnected, setStayConnected] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const [empresas, setEmpresas] = useState<any[]>([]);
 
   useEffect(() => {
     loadEmpresas();
+    loadSavedCredentials();
   }, []);
 
   const loadEmpresas = async () => {
@@ -39,6 +41,21 @@ export default function Index() {
       setEmpresas(empresasStorage ? JSON.parse(empresasStorage) : []);
     } catch (error) {
       console.error("Erro ao carregar empresas:", error);
+    }
+  };
+
+  const loadSavedCredentials = async () => {
+    try {
+      const savedCpf = await AsyncStorage.getItem("@savedCpf");
+      const savedSenha = await AsyncStorage.getItem("@savedSenha");
+
+      if (savedCpf && savedSenha) {
+        setCpf(savedCpf);
+        setPassword(savedSenha);
+        setStayConnected(true);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar credenciais salvas:", error);
     }
   };
 
@@ -51,6 +68,14 @@ export default function Index() {
     setLoading(true);
     try {
       const response = await signIn(cpf, senha);
+
+      if (stayConnected) {
+        await AsyncStorage.setItem("@savedCpf", cpf);
+        await AsyncStorage.setItem("@savedSenha", senha);
+      } else {
+        await AsyncStorage.removeItem("@savedCpf");
+        await AsyncStorage.removeItem("@savedSenha");
+      }
 
       const empresasStorage = await AsyncStorage.getItem("@empresas");
       const empresasParsed = empresasStorage ? JSON.parse(empresasStorage) : [];
@@ -71,7 +96,6 @@ export default function Index() {
     }
   };
 
-  // 🔧 Estilos adaptados ao tema
   const styles = StyleSheet.create({
     background: {
       flex: 1,
@@ -105,6 +129,19 @@ export default function Index() {
     toggleButton: {
       marginTop: 20,
       marginBottom: 20,
+      textAlign: "center",
+      alignItems: "center",
+    },
+    switchRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: 8,
+    },
+    switchLabel: {
+      color: theme.text,
+      fontSize: 14,
+      fontFamily: "Poppins",
     },
   });
 
@@ -139,6 +176,16 @@ export default function Index() {
             onChangeText={(text) => setPassword(text)}
             isPassword
           />
+
+          <View style={styles.switchRow}>
+            <Text style={styles.switchLabel}>Permanecer conectado</Text>
+            <Switch
+              value={stayConnected}
+              onValueChange={(value) => setStayConnected(value)}
+              trackColor={{ false: "#999", true: theme.primary }}
+              thumbColor={stayConnected ? "#fff" : "#ccc"}
+            />
+          </View>
 
           {loading ? (
             <ActivityIndicator size="large" color={theme.primary} />
