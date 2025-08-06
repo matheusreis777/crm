@@ -62,22 +62,12 @@ export default function Navbar({ toggleSidebar, title }: NavbarProps) {
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
+    backgroundColor: "#337bfe",
+    paddingTop: 60,
+    paddingBottom: 16,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 80 + (StatusBar.currentHeight || 20),
-    paddingTop: StatusBar.currentHeight || 50,
-    paddingHorizontal: 16,
-    backgroundColor: "#007AFF",
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    zIndex: 10,
   },
   iconButton: {
     marginRight: 16,

@@ -134,7 +134,6 @@ export default function Config() {
     container: {
       flex: 1,
       backgroundColor: theme.background,
-      paddingTop: 100,
     },
     overlay: {
       position: "absolute",
@@ -212,14 +211,11 @@ export default function Config() {
             onPress={toggleSidebar}
           />
         )}
+
         <SidebarMenu
+          sidebarOpen={sidebarOpen}
+          toggleSidebar={toggleSidebar}
           sidebarAnim={sidebarAnim}
-          nameUser={nameUser}
-          descriptionProfile={descriptionProfile}
-          login={login}
-          navigationTo={navigationTo}
-          handleSignOut={handleSignOut}
-          getInitials={getInitials}
         />
 
         <ScrollView>

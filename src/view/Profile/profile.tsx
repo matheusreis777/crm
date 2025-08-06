@@ -168,13 +168,9 @@ export default function Profile() {
           )}
 
           <SidebarMenu
+            sidebarOpen={sidebarOpen}
+            toggleSidebar={toggleSidebar}
             sidebarAnim={sidebarAnim}
-            nameUser={nameUser}
-            descriptionProfile={descriptionProfile}
-            login={login}
-            navigationTo={navigationTo}
-            handleSignOut={handleSignOut}
-            getInitials={getInitials}
           />
 
           <ScrollView contentContainerStyle={styles.content}>

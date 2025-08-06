@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Feather from "react-native-vector-icons/Feather";
 import {
   View,
@@ -22,44 +22,19 @@ import { useTheme } from "../../context/ThemeContext";
 import SidebarMenu from "../../components/sidebar-menu/SidebarMenu";
 
 const { width } = Dimensions.get("window");
-const STATUS_BAR_HEIGHT = StatusBar.currentHeight || 20;
 
 export default function Home() {
-  const { signOut } = useAuth();
   const navigation = useNavigation();
   const { theme } = useTheme();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const sidebarAnim = useState(new Animated.Value(-width))[0];
-
-  const [nameUser, setNameUser] = useState("");
-  const [descriptionProfile, setDescriptionProfile] = useState("");
-  const [login, setLogin] = useState("");
+  const sidebarAnim = useRef(new Animated.Value(-width)).current;
   const [refreshing, setRefreshing] = useState(false);
-
-  useEffect(() => {
-    async function loadUserData() {
-      const name = await AsyncStorage.getItem("@nameUser");
-      const description = await AsyncStorage.getItem("@descriptionProfile");
-      const loginStored = await AsyncStorage.getItem("@login");
-
-      setNameUser(name || "");
-      setDescriptionProfile(description || "");
-      setLogin(maskCPF(loginStored || ""));
-    }
-
-    loadUserData();
-  }, []);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 1500);
   }, []);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigation.navigate("Login" as never);
-  };
 
   const navigationTo = (caminho: string) => {
     navigation.navigate(caminho as never);
@@ -67,19 +42,14 @@ export default function Home() {
 
   const toggleSidebar = () => {
     const toValue = sidebarOpen ? -width : 0;
+
     Animated.timing(sidebarAnim, {
       toValue,
       duration: 300,
-      useNativeDriver: false,
-    }).start(() => setSidebarOpen(!sidebarOpen));
-  };
-
-  const getInitials = (name: string) => {
-    if (!name) return "";
-    const words = name.trim().split(" ");
-    const first = words[0]?.[0] || "";
-    const last = words.length > 1 ? words[words.length - 1]?.[0] : "";
-    return (first + last).toUpperCase();
+      useNativeDriver: true,
+    }).start(() => {
+      setSidebarOpen(!sidebarOpen);
+    });
   };
 
   const styles = StyleSheet.create({
@@ -88,13 +58,10 @@ export default function Home() {
       backgroundColor: theme.background,
     },
     overlay: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
+      ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0,0,0,0.3)",
       zIndex: 999,
+      display: sidebarOpen ? "flex" : "none",
     },
     sectionTitle: {
       fontSize: 22,
@@ -140,6 +107,7 @@ export default function Home() {
       justifyContent: "center",
       alignItems: "center",
       elevation: 6,
+      zIndex: 99,
     },
   });
 
@@ -157,20 +125,16 @@ export default function Home() {
         )}
 
         <SidebarMenu
+          sidebarOpen={sidebarOpen}
+          toggleSidebar={toggleSidebar}
           sidebarAnim={sidebarAnim}
-          nameUser={nameUser}
-          descriptionProfile={descriptionProfile}
-          login={login}
-          navigationTo={navigationTo}
-          handleSignOut={handleSignOut}
-          getInitials={getInitials}
         />
 
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{
             paddingHorizontal: 16,
-            paddingTop: 120,
+            paddingTop: 20,
             paddingBottom: 30,
           }}
           keyboardShouldPersistTaps="handled"

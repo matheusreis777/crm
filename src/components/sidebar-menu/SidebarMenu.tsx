@@ -8,43 +8,79 @@ import {
   Dimensions,
 } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "../../context/ThemeContext";
+import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "../../context/AuthContext";
 import SwitchTheme from "../../components/switch-theme/switch-theme";
 
-type Props = {
-  sidebarAnim: Animated.Value;
-  nameUser: string;
-  descriptionProfile: string;
-  login: string;
-  navigationTo: (screen: string) => void;
-  handleSignOut: () => void;
-  getInitials: (name: string) => string;
-};
+const { width } = Dimensions.get("window");
 
-const SidebarMenu: React.FC<Props> = ({
+interface SidebarMenuProps {
+  sidebarOpen: boolean;
+  toggleSidebar: () => void;
+  sidebarAnim: Animated.Value;
+}
+
+const SidebarMenu: React.FC<SidebarMenuProps> = ({
+  sidebarOpen,
+  toggleSidebar,
   sidebarAnim,
-  nameUser,
-  descriptionProfile,
-  login,
-  navigationTo,
-  handleSignOut,
-  getInitials,
 }) => {
   const { theme } = useTheme();
+  const navigation = useNavigation();
+  const { signOut } = useAuth();
+
+  const [nameUser, setNameUser] = React.useState("");
+  const [descriptionProfile, setDescriptionProfile] = React.useState("");
+  const [login, setLogin] = React.useState("");
+
+  React.useEffect(() => {
+    async function loadUserData() {
+      const name = await AsyncStorage.getItem("@nameUser");
+      const description = await AsyncStorage.getItem("@descriptionProfile");
+      const loginStored = await AsyncStorage.getItem("@login");
+
+      setNameUser(name || "");
+      setDescriptionProfile(description || "");
+      setLogin(loginStored || "");
+    }
+    loadUserData();
+  }, []);
+
+  const navigationTo = (screen: string) => {
+    navigation.navigate(screen as never);
+    toggleSidebar();
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigation.navigate("Login" as never);
+  };
+
+  const getInitials = (name: string) => {
+    if (!name) return "";
+    const words = name.trim().split(" ");
+    const first = words[0]?.[0] || "";
+    const last = words.length > 1 ? words[words.length - 1]?.[0] : "";
+    return (first + last).toUpperCase();
+  };
 
   const styles = StyleSheet.create({
     sidebar: {
       position: "absolute",
       top: 0,
       bottom: 0,
-      left: 0,
       width: 280,
-      zIndex: 999,
+      zIndex: 1000,
       backgroundColor: theme.background,
       paddingHorizontal: 20,
       paddingVertical: 30,
+      shadowColor: "#000",
+      shadowOpacity: 0.5,
+      shadowRadius: 10,
+      elevation: 20,
     },
-
     viewProfileRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -53,7 +89,6 @@ const SidebarMenu: React.FC<Props> = ({
       paddingBottom: 20,
       borderBottomColor: theme.text,
     },
-
     initialsCircle: {
       width: 60,
       height: 60,
@@ -63,28 +98,23 @@ const SidebarMenu: React.FC<Props> = ({
       alignItems: "center",
       marginRight: 15,
     },
-
     initialsText: {
       fontSize: 22,
       color: theme.text,
       fontWeight: "600",
     },
-
     viewProfileText: {
       flex: 1,
     },
-
     profileText: {
       fontSize: 14,
       color: theme.text,
     },
-
     textStrong: {
       fontWeight: "bold",
       fontSize: 16,
       color: theme.text,
     },
-
     menuItem: {
       flexDirection: "row",
       alignItems: "center",
@@ -92,18 +122,15 @@ const SidebarMenu: React.FC<Props> = ({
       borderBottomWidth: 1,
       borderBottomColor: theme.text || "#F2F2F2",
     },
-
     icon: {
       marginRight: 16,
       fontSize: 16,
     },
-
     sidebarItem: {
       fontSize: 16,
       color: theme.text,
       fontWeight: "500",
     },
-
     menuItemSair: {
       flexDirection: "row",
       borderTopWidth: 1,
@@ -115,7 +142,9 @@ const SidebarMenu: React.FC<Props> = ({
   });
 
   return (
-    <Animated.View style={[styles.sidebar, { left: sidebarAnim }]}>
+    <Animated.View
+      style={[styles.sidebar, { transform: [{ translateX: sidebarAnim }] }]}
+    >
       <View style={styles.viewProfileRow}>
         <View style={styles.initialsCircle}>
           <Text style={styles.initialsText}>{getInitials(nameUser)}</Text>
