@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Feather from "react-native-vector-icons/Feather";
 import {
   View,
   Text,
@@ -9,7 +8,6 @@ import {
   Keyboard,
   Dimensions,
   Animated,
-  StatusBar,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -75,10 +73,6 @@ export default function Profile() {
   async function handleSignOut() {
     await signOut();
     navigation.navigate("Login" as never);
-  }
-
-  function navigationTo(caminho: string) {
-    navigation.navigate(caminho as never);
   }
 
   const getInitials = (name: string) => {

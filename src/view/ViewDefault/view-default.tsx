@@ -222,13 +222,9 @@ export default function ViewDefault() {
         )}
 
         <SidebarMenu
+          sidebarOpen={sidebarOpen}
+          toggleSidebar={toggleSidebar}
           sidebarAnim={sidebarAnim}
-          nameUser={nameUser}
-          descriptionProfile={descriptionProfile}
-          login={login}
-          navigationTo={navigationTo}
-          handleSignOut={handleSignOut}
-          getInitials={getInitials}
         />
       </View>
     </TouchableWithoutFeedback>

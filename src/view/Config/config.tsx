@@ -20,7 +20,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import SidebarMenu from "../../components/sidebar-menu/SidebarMenu";
 import { useTheme } from "@/src/context/ThemeContext";
 import * as Notifications from "expo-notifications";
-import * as Camera from "expo-camera";
 import { useCameraPermissions, PermissionStatus } from "expo-camera";
 import { maskCPF } from "@/src/utils/util";
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import Feather from "react-native-vector-icons/Feather";
 import {
   View,
@@ -9,15 +9,11 @@ import {
   Keyboard,
   Dimensions,
   Animated,
-  StatusBar,
   ScrollView,
   RefreshControl,
 } from "react-native";
-import { useAuth } from "../../context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import Navbar from "@/src/components/navbar";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { maskCPF } from "@/src/utils/util";
 import { useTheme } from "../../context/ThemeContext";
 import SidebarMenu from "../../components/sidebar-menu/SidebarMenu";
 
