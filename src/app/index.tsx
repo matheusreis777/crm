@@ -181,13 +181,13 @@ export default function Index() {
             <Switch
               value={stayConnected}
               onValueChange={(value) => setStayConnected(value)}
-              trackColor={{ false: "#999", true: theme.primary }}
-              thumbColor={stayConnected ? "#fff" : "#ccc"}
+              trackColor={{ false: "#999", true: theme.backgroundCard }}
+              thumbColor={theme.buttonBackground}
             />
           </View>
 
           {loading ? (
-            <ActivityIndicator size="large" color={theme.primary} />
+            <ActivityIndicator size="large" color={theme.buttonBackground} />
           ) : (
             <Button title="Login" onPress={loginScreen} />
           )}

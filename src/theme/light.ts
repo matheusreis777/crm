@@ -4,8 +4,9 @@ export const lightTheme = {
   borderColor: "#0000000",
   text: "#000000",
   primary: "#1e90ff",
-  buttonBackground: "#e0e0e0",
+  buttonBackground: "#1e90ff",
   buttonText: "#000000",
-  backgroundCard: "#ebe7e7ff",
+  backgroundCard: "#dedcdcff",
   initialsCircle: "#337bfe",
+  statusBarStyle: "#094cc1ff" as const,
 };

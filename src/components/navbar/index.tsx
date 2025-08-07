@@ -9,6 +9,7 @@ import {
   StatusBar,
   TouchableOpacity,
 } from "react-native";
+import { useTheme } from "@/src/context/ThemeContext";
 
 type NavbarProps = {
   toggleSidebar: () => void;
@@ -18,6 +19,7 @@ type NavbarProps = {
 export default function Navbar({ toggleSidebar, title }: NavbarProps) {
   const [empresaSelecionada, setEmpresaSelecionada] = useState<any>({});
   const navigation = useNavigation();
+  const { theme } = useTheme();
 
   useEffect(() => {
     async function loadUserData() {
@@ -41,9 +43,37 @@ export default function Navbar({ toggleSidebar, title }: NavbarProps) {
     navigation.navigate("Intro" as never);
   };
 
+  // ✅ Estilos com acesso ao tema
+  const styles = StyleSheet.create({
+    container: {
+      backgroundColor: theme.buttonBackground,
+      paddingTop: 60,
+      paddingBottom: 16,
+      paddingHorizontal: 16,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    iconButton: {
+      marginRight: 16,
+    },
+    textContainer: {
+      flexDirection: "column",
+    },
+    title: {
+      color: "#fff",
+      fontSize: 20,
+      fontWeight: "bold",
+    },
+    subtitle: {
+      color: "#fff",
+      fontSize: 14,
+      marginTop: 2,
+    },
+  });
+
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor={theme.primary} />
       <TouchableOpacity style={styles.iconButton} onPress={toggleSidebar}>
         <Ionicons name="menu" size={28} color="#fff" />
       </TouchableOpacity>
@@ -59,30 +89,3 @@ export default function Navbar({ toggleSidebar, title }: NavbarProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#337bfe",
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  iconButton: {
-    marginRight: 16,
-  },
-  textContainer: {
-    flexDirection: "column",
-  },
-  title: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    color: "#fff",
-    fontSize: 14,
-    marginTop: 2,
-  },
-});

@@ -24,6 +24,8 @@ import { useTheme } from "@/src/context/ThemeContext";
 
 const { width } = Dimensions.get("window");
 
+// ...imports (sem alterações)
+
 export default function Profile() {
   const { signOut } = useAuth();
   const navigation = useNavigation();
@@ -98,10 +100,8 @@ export default function Profile() {
       zIndex: 15,
     },
     content: {
-      flex: 1,
       padding: 24,
-      gap: 20,
-      justifyContent: "center",
+      paddingTop: 16, // pequeno espaço depois da Navbar
     },
     header: {
       alignItems: "center",
@@ -130,17 +130,6 @@ export default function Profile() {
       fontSize: 14,
       color: theme.text,
     },
-    logoutButton: {
-      marginTop: 20,
-      backgroundColor: theme.buttonBackground,
-      paddingVertical: 12,
-      borderRadius: 8,
-      alignItems: "center",
-    },
-    logoutText: {
-      color: theme.text,
-      fontWeight: "bold",
-    },
   });
 
   return (
@@ -148,7 +137,7 @@ export default function Profile() {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={80} // ajuste se sua navbar for fixa
+        keyboardVerticalOffset={80}
       >
         <View style={styles.container}>
           <Navbar toggleSidebar={toggleSidebar} title="Perfil" />

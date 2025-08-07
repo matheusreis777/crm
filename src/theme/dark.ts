@@ -1,11 +1,11 @@
 export const darkTheme = {
   mode: "dark",
-  background: "#121212",
+  background: "#343434ff",
   text: "#ffffff",
   borderColor: "#ffffff",
-  primary: "#bb86fc",
-  buttonBackground: "#333333",
+  buttonBackground: "#094cc1ff",
   buttonText: "#ffffff",
-  backgroundCard: "#464444ff",
-  initialsCircle: "#337bfe",
+  backgroundCard: "#201f1fff",
+  initialsCircle: "#072355ff",
+  statusBarStyle: "#094cc1ff" as const,
 };
