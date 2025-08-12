@@ -13,6 +13,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../context/AuthContext";
 import SwitchTheme from "../../components/switch-theme/switch-theme";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
@@ -164,7 +165,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({
           style={styles.menuItem}
           onPress={() => navigationTo("Home")}
         >
-          <Feather
+          <FontAwesome5
             name="home"
             size={24}
             color={theme.text}
@@ -177,11 +178,12 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({
           style={styles.menuItem}
           onPress={() => navigationTo("Profile")}
         >
-          <Feather
-            name="user"
+          <FontAwesome5
+            name="user-alt"
             size={24}
             color={theme.text}
             style={styles.icon}
+            solid
           />
           <Text style={styles.sidebarItem}>Perfil</Text>
         </TouchableOpacity>
@@ -190,13 +192,26 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({
           style={styles.menuItem}
           onPress={() => navigationTo("Config")}
         >
-          <Feather
-            name="settings"
+          <FontAwesome5
+            name="cog"
             size={24}
             color={theme.text}
             style={styles.icon}
           />
           <Text style={styles.sidebarItem}>Configurações</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigationTo("Veiculo")}
+        >
+          <FontAwesome5
+            name="car"
+            size={24}
+            color={theme.text}
+            style={styles.icon}
+          />
+          <Text style={styles.sidebarItem}>Veículos</Text>
         </TouchableOpacity>
       </View>
 

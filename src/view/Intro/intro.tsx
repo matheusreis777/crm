@@ -29,6 +29,7 @@ export default function Intro() {
 
   async function selectEmpresa(empresa: any) {
     await AsyncStorage.setItem("@empresaSelecionada", JSON.stringify(empresa));
+    await AsyncStorage.setItem("@empresaId", String(empresa.id));
     navigation.navigate("Home" as never);
   }
 
@@ -48,6 +49,13 @@ export default function Intro() {
             "@empresaSelecionada",
             JSON.stringify(empresasParsed[0])
           );
+
+          await AsyncStorage.setItem(
+            "@empresaId",
+            JSON.stringify(empresasParsed[0].Id)
+          );
+
+          console.log(empresasParsed[0].Id);
 
           navigation.navigate("Home" as never);
         }

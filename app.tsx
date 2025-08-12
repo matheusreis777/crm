@@ -9,6 +9,7 @@ import Profile from "./src/view/Profile/profile";
 import Config from "./src/view/Config/config";
 import Intro from "./src/view/Intro/intro";
 import { ThemeProvider } from "./src/context/ThemeContext";
+import Veiculo from "./src/view/Veiculo/veiculo";
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,11 @@ export default function App() {
             <Stack.Screen
               name="Config"
               component={Config}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Veiculo"
+              component={Veiculo}
               options={{ headerShown: false }}
             />
           </Stack.Navigator>

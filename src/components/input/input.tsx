@@ -6,18 +6,19 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { TextInputMask } from "react-native-masked-text";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "@/src/context/ThemeContext";
 
 interface InputProps extends TextInputProps {
-  type?: "cpf" | "phone" | "date" | "default";
+  type?: "cpf" | "phone" | "date" | "plate" | "default";
   isPassword?: boolean;
 }
 
 export function Input({
   type = "default",
   isPassword = false,
+  value,
+  onChangeText,
   ...rest
 }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
@@ -57,41 +58,42 @@ export function Input({
   const placeholderTextColor =
     theme.text || (theme.mode === "dark" ? "#aaaaaa" : "#888888");
 
-  // Tipos com máscara
-  if (type === "cpf" || type === "phone" || type === "date") {
-    let maskType: any = type;
-    let options: any = {};
-
-    if (type === "phone") {
-      maskType = "cel-phone";
-      options = {
-        maskType: "BRL",
-        withDDD: true,
-        dddMask: "(99) ",
-      };
+  const handlePlateChange = (text?: string) => {
+    if (!text) {
+      onChangeText && onChangeText("");
+      return;
     }
 
-    if (type === "date") {
-      maskType = "datetime";
-      options = {
-        format: "DD/MM/YYYY",
-      };
+    let cleaned = text.toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+    if (cleaned.length > 7) cleaned = cleaned.slice(0, 7);
+
+    let formatted = cleaned;
+
+    if (cleaned.length > 3) {
+      formatted = cleaned.slice(0, 3) + "-" + cleaned.slice(3);
     }
 
+    onChangeText && onChangeText(formatted);
+  };
+
+  if (type === "plate") {
     return (
       <View style={styles.container}>
-        <TextInputMask
-          type={maskType}
-          options={options}
+        <TextInput
           style={styles.input}
           placeholderTextColor={placeholderTextColor}
+          autoCapitalize="characters"
+          value={value}
+          onChangeText={handlePlateChange}
+          keyboardType="default"
+          maxLength={8}
           {...rest}
         />
       </View>
     );
   }
 
-  // Tipo padrão ou senha
   return (
     <View style={styles.container}>
       <View style={styles.inputWrapper}>
@@ -99,6 +101,8 @@ export function Input({
           style={styles.input}
           secureTextEntry={isPassword && !showPassword}
           placeholderTextColor={placeholderTextColor}
+          value={value}
+          onChangeText={onChangeText}
           {...rest}
         />
         {isPassword && (
