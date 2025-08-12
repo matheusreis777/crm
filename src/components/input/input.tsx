@@ -80,16 +80,27 @@ export function Input({
   if (type === "plate") {
     return (
       <View style={styles.container}>
-        <TextInput
-          style={styles.input}
-          placeholderTextColor={placeholderTextColor}
-          autoCapitalize="characters"
-          value={value}
-          onChangeText={handlePlateChange}
-          keyboardType="default"
-          maxLength={8}
-          {...rest}
-        />
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholderTextColor={placeholderTextColor}
+            autoCapitalize="characters"
+            value={value}
+            onChangeText={handlePlateChange}
+            keyboardType="default"
+            maxLength={8}
+            {...rest}
+          />
+
+          {(value || "").length > 0 && (
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => onChangeText && onChangeText("")}
+            >
+              <Feather name="x-circle" size={20} color={placeholderTextColor} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     );
   }
