@@ -25,7 +25,7 @@ const showNext = () => {
     position: "bottom",
     bottomOffset: 20,
     visibilityTime: 3000,
-    onHide: showNext, // chama o próximo toast quando esse some
+    onHide: showNext,
   });
 };
 
