@@ -26,6 +26,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { VeiculoModel } from "@/src/models/veiculo";
 import * as Clipboard from "expo-clipboard";
 import { Feather } from "@expo/vector-icons";
+import ToastService from "../../components/alerts/ToastService";
 
 const { width } = Dimensions.get("window");
 
@@ -53,9 +54,14 @@ export default function Veiculo() {
   }, [placa]);
 
   const copyToClipboard = async (value: string) => {
-    if (!value) return;
+    if (!value) {
+      ToastService.error("Erro", "Não há valor para copiar");
+      return;
+    }
+
     await Clipboard.setStringAsync(value);
-    Alert.alert("Copiado", `${value} copiado para a área de transferência!`);
+
+    ToastService.success("Copiado!", `${value}`);
   };
 
   const toggleSidebar = () => {
